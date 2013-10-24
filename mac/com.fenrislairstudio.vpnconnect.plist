@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <dict>
+      <key>NetworkState</key>
+      <true/>
+    </dict>
+    <key>Label</key>
+    <string>com.fenrislairstudio.vpnconnect</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>bash</string>
+      <string>-c</string>
+      <string>
+	(test $(networksetup -showpppoestatus "Untold VPN") = 'disconnected' &amp;&amp; ping -o mail.untold-universe.com &amp;&amp; networksetup -connectpppoeservice "Untold VPN" &amp;&amp; route -n add 192.168.1.0/24 192.168.42.1) ; sleep 10
+      </string>
+    </array>
+  </dict>
+</plist>
