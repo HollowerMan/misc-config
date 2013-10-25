@@ -1,0 +1,43 @@
+case "$1" in
+	start)
+		echo "Starting my Ipsec VPN"
+		/etc/init.d/ipsec start
+		/etc/init.d/xl2tpd start
+		/usr/sbin/ipsec auto --up L2TP-PSK
+		echo "c untold-vpn" > /var/run/xl2tpd/l2tp-control
+		/bin/sleep 10
+		/sbin/route add -net 192.168.1.0/24 dev ppp0
+		/sbin/route add -net 192.168.42.0/24 dev ppp0
+	;;
+	stop)
+		echo "Stopping my Ipsec VPN"
+		/sbin/route del -net 192.168.1.0/24 dev ppp0
+		/sbin/route del -net 192.168.42.0/24 dev ppp0
+		echo "d untold-vpn" > /var/run/xl2tpd/l2tp-control
+		/bin/sleep 10
+		/usr/sbin/ipsec auto --down L2TP-PSK
+		/etc/init.d/ipsec stop
+		/etc/init.d/xl2tpd stop
+	;;
+	restart)
+		echo "Restarting my Ipsec VPN"
+		/sbin/route del -net 192.168.1.0/24 dev ppp0
+		/sbin/route del -net 192.168.42.0/24 dev ppp0
+		echo "d untold-vpn" > /var/run/xl2tpd/l2tp-control
+		/bin/sleep 3
+		/usr/sbin/ipsec auto --down L2TP-PSK
+
+		/etc/init.d/ipsec restart
+		/etc/init.d/xl2tpd restart
+
+		/usr/sbin/ipsec auto --up L2TP-PSK
+		echo "c untold-vpn" > /var/run/xl2tpd/l2tp-control
+		/bin/sleep 3
+		/sbin/route add -net 192.168.1.0/24 dev ppp0
+		/sbin/route add -net 192.168.42.0/24 dev ppp0
+	;;
+	*)
+		echo "Usage: /etc/init.d/ipsec.vpn  {start|stop|restart}"
+		exit 1
+	;;
+esac
